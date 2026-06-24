@@ -28,7 +28,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # ============================================================
-# PYTHON BASE
+# PYTHON BASE STACK
 # ============================================================
 RUN pip install --no-cache-dir \
     numpy einops safetensors tqdm pillow \
@@ -39,7 +39,7 @@ RUN pip install --no-cache-dir \
 
 
 # ============================================================
-# HF CONFIG (MUST BE EARLY)
+# HF CONFIG
 # ============================================================
 ENV HF_HUB_ENABLE_HF_TRANSFER=1
 ENV HF_HOME=/workspace/.cache/huggingface
@@ -47,7 +47,7 @@ ENV TRANSFORMERS_CACHE=/workspace/.cache/huggingface
 
 
 # ============================================================
-# CORE MANAGER (ONLY ONCE)
+# CORE MANAGER
 # ============================================================
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git \
     custom_nodes/ComfyUI-Manager \
@@ -80,7 +80,7 @@ RUN git clone https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved.git \
 
 
 # ============================================================
-# MODEL / GENERATION STACK
+# MODEL / LOADER STACK
 # ============================================================
 RUN git clone https://github.com/willmiao/ComfyUI-Lora-Manager.git \
     custom_nodes/ComfyUI-Lora-Manager \
@@ -102,11 +102,10 @@ RUN git clone https://github.com/WASasquatch/was-node-suite-comfyui.git \
  && pip install --no-cache-dir -r custom_nodes/was-node-suite-comfyui/requirements.txt
 
 RUN git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git \
-    custom_nodes/ComfyUI_UltimateSDUpscale \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI_UltimateSDUpscale/requirements.txt || true
+    custom_nodes/ComfyUI_UltimateSDUpscale
 
-RUN git clone https://github.com/ssitu/ComfyUI_SDXL_EmptyLatentImage.git \
-    custom_nodes/ComfyUI_SDXL_EmptyLatentImage
+RUN git clone https://github.com/ssitu/ComfyUI-EmptyLatentImage.git \
+    custom_nodes/ComfyUI-EmptyLatentImage || true
 
 
 # ============================================================
@@ -131,7 +130,7 @@ RUN git clone https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait.git 
 
 
 # ============================================================
-# LOGIC + PROMPT CONTROL
+# LOGIC / PROMPT SYSTEMS
 # ============================================================
 RUN git clone https://github.com/ltdrdata/ComfyUI-Logic.git \
     custom_nodes/ComfyUI-Logic
@@ -141,7 +140,7 @@ RUN git clone https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb.git \
 
 
 # ============================================================
-# UI + UTILS (DEDUPED)
+# UI / UTILITIES
 # ============================================================
 RUN git clone https://github.com/crystian/ComfyUI-Crystools.git \
     custom_nodes/ComfyUI-Crystools \
