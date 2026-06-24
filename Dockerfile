@@ -36,6 +36,26 @@ RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requi
 RUN git clone https://github.com/willmiao/ComfyUI-Lora-Manager.git custom_nodes/comfyui-lora-manager
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Lora-Manager/requirements.txt
 
+# Impact Pack (For Auto-Detailing & Upscaling)
+RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git custom_nodes/ComfyUI-Impact-Pack
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Impact-Pack/requirements.txt
+
+# WAS Node Suite (The "Swiss Army Knife" of image processing)
+RUN git clone https://github.com/WASasquatch/was-node-suite-comfyui.git custom_nodes/was-node-suite-comfyui
+RUN pip install --no-cache-dir -r custom_nodes/was-node-suite-comfyui/requirements.txt
+
+# LayerStyle (For Photoshop-like editing)
+RUN git clone https://github.com/chflame163/ComfyUI_LayerStyle.git custom_nodes/ComfyUI_LayerStyle
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI_LayerStyle/requirements.txt
+
+# Civitai Integration
+RUN git clone https://github.com/civitai/civitai_comfy_nodes.git custom_nodes/civitai_comfy_nodes
+RUN pip install --no-cache-dir -r custom_nodes/civitai_comfy_nodes/requirements.txt
+
+# Inspire Pack (For LoRA control)
+RUN git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git custom_nodes/ComfyUI-Inspire-Pack
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Inspire-Pack/requirements.txt
+
 
 
 
