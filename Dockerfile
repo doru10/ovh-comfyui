@@ -41,8 +41,9 @@ RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-VideoHelperSuite/requirem
 RUN git clone https://github.com/naxci1/ComfyUI-FlashVSR_Stable.git custom_nodes/ComfyUI-FlashVSR
 
 RUN git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git custom_nodes/ComfyUI-Frame-Interpolation
-RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements-with-cupy.txt
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements-no-cupy.txt
 
+RUN pip install --no-cache-dir cupy-cuda12x
 RUN git clone https://github.com/willmiao/ComfyUI-Lora-Manager.git \
     custom_nodes/ComfyUI-Lora-Manager
 RUN pip install --no-cache-dir \
