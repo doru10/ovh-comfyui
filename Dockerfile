@@ -24,6 +24,15 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install nodes
+RUN pip install --no-cache-dir \
+    torchvision \
+    numpy \
+    einops \
+    safetensors \
+    tqdm \
+    pillow \
+    huggingface_hub
+
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Manager/requirements.txt
 
