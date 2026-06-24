@@ -3,6 +3,11 @@ FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git python3 python3-pip libgl1 libglib2.0-0 \
+    build-essential cmake python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    git python3 python3-pip libgl1 libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Create working directory
@@ -15,6 +20,7 @@ RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git .
 
 # Install ComfyUI dependencies
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install nodes
@@ -28,6 +34,7 @@ RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git custom
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt
 
 RUN git clone https://github.com/naxci1/ComfyUI-FlashVSR_Stable.git custom_nodes/ComfyUI-FlashVSR
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-FlashVSR/requirements.txt
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-FlashVSR/requirements.txt
 
 RUN git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git custom_nodes/ComfyUI-Frame-Interpolation
