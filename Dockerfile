@@ -56,6 +56,13 @@ RUN pip install --no-cache-dir -r custom_nodes/civitai_comfy_nodes/requirements.
 RUN git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git custom_nodes/ComfyUI-Inspire-Pack
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Inspire-Pack/requirements.txt
 
+# IPAdapter (For image-to-image/style transfer)
+RUN git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus.git custom_nodes/ComfyUI_IPAdapter_plus
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI_IPAdapter_plus/requirements.txt
+
+# ControlNet Auxiliary Preprocessors
+RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git custom_nodes/comfyui_controlnet_aux
+RUN pip install --no-cache-dir -r custom_nodes/comfyui_controlnet_aux/requirements.txt
 
 
 
