@@ -10,24 +10,26 @@ RUN apt-get update && apt-get install -y \
     build-essential cmake python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-
 WORKDIR /workspace
 
 
 # ============================================================
-# GIT SAFETY FIX (OVH SAFE)
+# OVH PERFORMANCE LAYER (CRITICAL)
 # ============================================================
+ENV HF_HOME=/workspace/models/hf_cache
+ENV TRANSFORMERS_CACHE=/workspace/models/hf_cache
+ENV TORCH_HOME=/workspace/models/torch_cache
+ENV XDG_CACHE_HOME=/workspace/models/cache
+ENV PIP_CACHE_DIR=/workspace/models/pip_cache
+
+ENV HF_XET_HIGH_PERFORMANCE=1
 ENV GIT_TERMINAL_PROMPT=0
 ENV GIT_LFS_SKIP_SMUDGE=1
 
-RUN git config --global url."https://github.com/".insteadOf git@github.com: \
- && git config --global url."https://github.com/".insteadOf ssh://git@github.com
-
-
 # ============================================================
-# PYTORCH (FIXED — CRASH ROOT FIX)
+# PYTORCH (STABLE MATCHED STACK)
 # ============================================================
-RUN pip uninstall -y torch torchvision torchaudio || true
+RUN pip install --no-cache-dir --upgrade pip
 
 RUN pip install --no-cache-dir \
     torch==2.2.2+cu121 torchvision==0.17.2+cu121 torchaudio==2.2.2+cu121 \
@@ -38,12 +40,11 @@ RUN pip install --no-cache-dir \
 # COMFYUI CORE
 # ============================================================
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 
 # ============================================================
-# PYTHON BASE STACK (ALL-IN-ONE)
+# BASE AI STACK (FLUX + SDXL READY)
 # ============================================================
 RUN pip install --no-cache-dir \
     numpy einops safetensors tqdm pillow \
@@ -51,162 +52,110 @@ RUN pip install --no-cache-dir \
     sentencepiece protobuf requests aiohttp psutil \
     opencv-python-headless imageio imageio-ffmpeg av \
     onnxruntime-gpu xformers insightface \
-    hf_transfer
+    diffusers hf_transfer
 
 
 # ============================================================
-# HF CONFIG (UPDATED)
-# ============================================================
-ENV HF_XET_HIGH_PERFORMANCE=1
-ENV HF_HOME=/workspace/.cache/huggingface
-ENV TRANSFORMERS_CACHE=/workspace/.cache/huggingface
-
-
-# ============================================================
-# COMFYUI MANAGER
+# COMFYUI MANAGER (AUTO FIX + AUTO INSTALL)
 # ============================================================
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git \
     custom_nodes/ComfyUI-Manager \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-Manager/requirements.txt
+ && pip install --no-cache-dir -r custom_nodes/ComfyUI-Manager/requirements.txt || true
 
 
 # ============================================================
-# VIDEO / ANIMATION STACK
+# CORE NODE STACK
 # ============================================================
-RUN git clone --depth 1 https://github.com/kijai/ComfyUI-WanVideoWrapper.git \
-    custom_nodes/ComfyUI-WanVideoWrapper \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-WanVideoWrapper/requirements.txt
-
-RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git \
-    custom_nodes/ComfyUI-VideoHelperSuite \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt
-
-RUN git clone --depth 1 https://github.com/naxci1/ComfyUI-FlashVSR_Stable.git \
-    custom_nodes/ComfyUI-FlashVSR
-
-RUN git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git \
-    custom_nodes/ComfyUI-Frame-Interpolation \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements-no-cupy.txt
-
-RUN pip install --no-cache-dir cupy-cuda12x
-
-RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved.git \
-    custom_nodes/ComfyUI-AnimateDiff-Evolved \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-AnimateDiff-Evolved/requirements.txt || true
+RUN git clone --depth 1 https://github.com/civitai/civitai_comfy_nodes.git custom_nodes/civitai_comfy_nodes || true
+RUN git clone --depth 1 https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git custom_nodes/ComfyUI_UltimateSDUpscale || true
+RUN git clone --depth 1 https://github.com/ssitu/ComfyUI_SDXL_EmptyLatentImage.git custom_nodes/ComfyUI_SDXL_EmptyLatentImage || true
 
 
 # ============================================================
-# MODEL / LOADER STACK
+# VIDEO STACK
 # ============================================================
-RUN git clone --depth 1 https://github.com/willmiao/ComfyUI-Lora-Manager.git \
-    custom_nodes/ComfyUI-Lora-Manager \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-Lora-Manager/requirements.txt
-
-RUN git clone --depth 1 https://github.com/civitai/civitai_comfy_nodes.git \
-    custom_nodes/civitai_comfy_nodes
-
-RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git \
-    custom_nodes/ComfyUI-Impact-Pack \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-Impact-Pack/requirements.txt
-
-RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git \
-    custom_nodes/ComfyUI-Impact-Subpack \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-Impact-Subpack/requirements.txt || true
-
-RUN git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git \
-    custom_nodes/was-node-suite-comfyui \
- && pip install --no-cache-dir -r custom_nodes/was-node-suite-comfyui/requirements.txt
-
-RUN git clone --depth 1 https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git \
-    custom_nodes/ComfyUI_UltimateSDUpscale || true
-
-RUN git clone --depth 1 https://github.com/ssitu/ComfyUI_SDXL_EmptyLatentImage.git \
-    custom_nodes/ComfyUI_SDXL_EmptyLatentImage || true
+RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git custom_nodes/ComfyUI-VideoHelperSuite
+RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved.git custom_nodes/ComfyUI-AnimateDiff-Evolved || true
+RUN git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git custom_nodes/ComfyUI-Frame-Interpolation || true
+RUN pip install --no-cache-dir cupy-cuda12x || true
 
 
 # ============================================================
-# IMAGE / CONTROL STACK
+# CONTROL STACK
 # ============================================================
-RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git \
-    custom_nodes/ComfyUI_IPAdapter_plus
-
-RUN mkdir -p models/ipadapter models/clip_vision
-
-RUN git clone --depth 1 https://github.com/Fannovel16/comfyui_controlnet_aux.git \
-    custom_nodes/comfyui_controlnet_aux \
- && pip install --no-cache-dir -r custom_nodes/comfyui_controlnet_aux/requirements.txt
-
-RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-Advanced-ControlNet.git \
-    custom_nodes/ComfyUI-Advanced-ControlNet || true
-
-RUN git clone --depth 1 https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait.git \
-    custom_nodes/ComfyUI-AdvancedLivePortrait || true
+RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git custom_nodes/ComfyUI_IPAdapter_plus
+RUN git clone --depth 1 https://github.com/Fannovel16/comfyui_controlnet_aux.git custom_nodes/comfyui_controlnet_aux
 
 
 # ============================================================
-# LOGIC / PROMPT SYSTEMS
+# CORE PACKS
 # ============================================================
-RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Logic.git \
-    custom_nodes/ComfyUI-Logic || true
-
-RUN git clone --depth 1 https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb.git \
-    custom_nodes/ComfyUI_ADV_CLIP_emb
-
-
-# ============================================================
-# UI / UTILITIES (FULL STACK)
-# ============================================================
-RUN git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git \
-    custom_nodes/ComfyUI-Crystools \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-Crystools/requirements.txt
-
-RUN git clone --depth 1 https://github.com/city96/ComfyUI-GGUF.git \
-    custom_nodes/ComfyUI-GGUF || true
-
-RUN git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git \
-    custom_nodes/ComfyUI-KJNodes \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-KJNodes/requirements.txt
-
-RUN git clone --depth 1 https://github.com/alexopus/ComfyUI-Image-Saver.git \
-    custom_nodes/ComfyUI-Image-Saver
-
-RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git \
-    custom_nodes/ComfyUI_essentials \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI_essentials/requirements.txt
-
-RUN git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git \
-    custom_nodes/ComfyUI-Custom-Scripts
-
-RUN git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git \
-    custom_nodes/ComfyUI-Easy-Use \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-Easy-Use/requirements.txt
-
-RUN git clone --depth 1 https://github.com/stavsap/ComfyUI-Ollama.git \
-    custom_nodes/ComfyUI-Ollama \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI-Ollama/requirements.txt
-
-RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git \
-    custom_nodes/rgthree-comfy
+RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git custom_nodes/ComfyUI-Impact-Pack || true
+RUN git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git custom_nodes/was-node-suite-comfyui || true
+RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Logic.git custom_nodes/ComfyUI-Logic || true
+RUN git clone --depth 1 https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb.git custom_nodes/ComfyUI_ADV_CLIP_emb
 
 
 # ============================================================
-# HF DOWNLOADER NODE
+# UI STACK
 # ============================================================
-RUN git clone --depth 1 https://github.com/if-ai/ComfyUI-IF_AI_HFDownloaderNode.git \
-    custom_nodes/ComfyUI-IF_AI_HFDownloaderNode || true
+RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git custom_nodes/ComfyUI_essentials || true
+RUN git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git custom_nodes/ComfyUI-Custom-Scripts || true
+RUN git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git custom_nodes/ComfyUI-Easy-Use || true
+RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git custom_nodes/rgthree-comfy || true
 
 
 # ============================================================
-# PERMISSIONS (OVH REQUIRED)
+# FLUX + SDXL MODEL SYSTEM (REAL ENGINE)
+# ============================================================
+RUN mkdir -p /workspace/models/{checkpoints,loras,controlnet,vae,clip,hf_cache}
+
+# FLUX SUPPORT (diffusers backend already installed)
+RUN pip install --no-cache-dir git+https://github.com/huggingface/diffusers.git
+
+
+# ============================================================
+# MODEL AUTO BOOTSTRAP (SDXL + FLUX CORE MODELS)
+# ============================================================
+RUN mkdir -p /workspace/scripts
+
+RUN printf '%s\n' \
+'#!/bin/bash' \
+'set -e' \
+'' \
+'echo "== OVH MODEL BOOT ==" ' \
+'' \
+'# SDXL auto download' \
+'if [ ! -f /workspace/models/checkpoints/sdxl.safetensors ]; then' \
+'  echo "Downloading SDXL..."' \
+'  curl -L -o /workspace/models/checkpoints/sdxl.safetensors \' \
+'  https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors' \
+'fi' \
+'' \
+'# FLUX placeholder structure (user loads real weights or HF cache)' \
+'mkdir -p /workspace/models/flux' \
+'' \
+'echo "Boot complete"' \
+'' \
+'# warm import cache (faster startup)' \
+'python3 -c "import torch; import comfy; print(\"warm cache ready\")"' \
+'' \
+'exec python3 main.py --listen 0.0.0.0 --port 8188' \
+> /workspace/scripts/start.sh
+
+RUN chmod +x /workspace/scripts/start.sh
+
+
+# ============================================================
+# OVH PERMISSIONS
 # ============================================================
 RUN chown -R 42420:42420 /workspace
 
 ENV HOME=/workspace
-
 USER 42420:42420
 
 
 # ============================================================
 # START
 # ============================================================
-CMD ["python3", "main.py", "--listen", "0.0.0.0", "--port", "8188"]
+CMD ["/workspace/scripts/start.sh"]
