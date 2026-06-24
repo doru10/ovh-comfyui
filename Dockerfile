@@ -99,7 +99,7 @@ RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git custom_node
 # ============================================================
 # FLUX FOUNDATION
 # ============================================================
-RUN pip install --no-cache-dir \
+RUN pip install --no-cache-dir --no-deps \
     git+https://github.com/huggingface/diffusers.git
 
 RUN mkdir -p /workspace/models/flux \
@@ -112,7 +112,8 @@ RUN mkdir -p /workspace/models/flux \
 # ============================================================
 # AUTO INSTALL ALL NODE REQUIREMENTS (IMPORTANT FIX)
 # ============================================================
-RUN find custom_nodes -name "requirements.txt" -exec pip install --no-cache-dir -r {} \; || true
+# More robust node dependency installation
+RUN find custom_nodes -name "requirements.txt" -exec pip install --no-cache-dir --no-deps -r {} \; || true
 RUN find custom_nodes -name "requirements-no-cupy.txt" -exec pip install --no-cache-dir -r {} \; || true
 
 # ============================================================
