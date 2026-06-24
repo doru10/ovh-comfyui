@@ -43,8 +43,6 @@ RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git custom
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt
 
 RUN git clone https://github.com/naxci1/ComfyUI-FlashVSR_Stable.git custom_nodes/ComfyUI-FlashVSR
-RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-FlashVSR/requirements.txt
-RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-FlashVSR/requirements.txt
 
 RUN git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git custom_nodes/ComfyUI-Frame-Interpolation
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements.txt
