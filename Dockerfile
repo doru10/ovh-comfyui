@@ -17,11 +17,26 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git .
 # Install ComfyUI dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install ComfyUI Manager (Essential for easily downloading Wan2.1 models later)
+# Install nodes
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Manager/requirements.txt
+
 RUN git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git custom_nodes/ComfyUI-WanVideoWrapper
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-WanVideoWrapper/requirements.txt
+
+RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git custom_nodes/ComfyUI-VideoHelperSuite
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt
+
+RUN git clone https://github.com/naxci1/ComfyUI-FlashVSR_Stable.git custom_nodes/ComfyUI-FlashVSR
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-FlashVSR/requirements.txt
+
+RUN git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git custom_nodes/ComfyUI-Frame-Interpolation
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements.txt
+
+RUN git clone https://github.com/willmiao/ComfyUI-Lora-Manager.git custom_nodes/comfyui-lora-manager
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Lora-Manager/requirements.txt
+
+
 
 
 # Fix permissions for the strict OVH user
