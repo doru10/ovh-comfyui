@@ -20,6 +20,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install ComfyUI Manager (Essential for easily downloading Wan2.1 models later)
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Manager/requirements.txt
+RUN git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git custom_nodes/ComfyUI-WanVideoWrapper
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-WanVideoWrapper/requirements.txt
+
 
 # Fix permissions for the strict OVH user
 RUN chown -R 42420:42420 /workspace
