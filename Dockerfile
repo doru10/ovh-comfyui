@@ -12,6 +12,18 @@ WORKDIR /workspace
 
 
 # ============================================================
+# GIT SAFETY FIX (IMPORTANT FOR OVH)
+# ============================================================
+ENV GIT_TERMINAL_PROMPT=0
+ENV GIT_LFS_SKIP_SMUDGE=1
+
+RUN git config --global url."https://github.com/".insteadOf git@github.com: \
+ && git config --global url."https://github.com/".insteadOf ssh://git@github.com \
+ && git config --global http.lowSpeedLimit 0 \
+ && git config --global http.lowSpeedTime 999999
+
+
+# ============================================================
 # PYTORCH
 # ============================================================
 RUN pip install --no-cache-dir \
@@ -49,7 +61,7 @@ ENV TRANSFORMERS_CACHE=/workspace/.cache/huggingface
 # ============================================================
 # CORE MANAGER
 # ============================================================
-RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git \
+RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git \
     custom_nodes/ComfyUI-Manager \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Manager/requirements.txt
 
@@ -57,24 +69,24 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git \
 # ============================================================
 # VIDEO / WAN STACK
 # ============================================================
-RUN git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git \
+RUN git clone --depth 1 https://github.com/kijai/ComfyUI-WanVideoWrapper.git \
     custom_nodes/ComfyUI-WanVideoWrapper \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-WanVideoWrapper/requirements.txt
 
-RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git \
+RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git \
     custom_nodes/ComfyUI-VideoHelperSuite \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt
 
-RUN git clone https://github.com/naxci1/ComfyUI-FlashVSR_Stable.git \
+RUN git clone --depth 1 https://github.com/naxci1/ComfyUI-FlashVSR_Stable.git \
     custom_nodes/ComfyUI-FlashVSR
 
-RUN git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git \
+RUN git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git \
     custom_nodes/ComfyUI-Frame-Interpolation \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements-no-cupy.txt
 
 RUN pip install --no-cache-dir cupy-cuda12x
 
-RUN git clone https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved.git \
+RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved.git \
     custom_nodes/ComfyUI-AnimateDiff-Evolved \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-AnimateDiff-Evolved/requirements.txt || true
 
@@ -82,49 +94,46 @@ RUN git clone https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved.git \
 # ============================================================
 # MODEL / LOADER STACK
 # ============================================================
-RUN git clone https://github.com/willmiao/ComfyUI-Lora-Manager.git \
+RUN git clone --depth 1 https://github.com/willmiao/ComfyUI-Lora-Manager.git \
     custom_nodes/ComfyUI-Lora-Manager \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Lora-Manager/requirements.txt
 
-RUN git clone https://github.com/civitai/civitai_comfy_nodes.git \
+RUN git clone --depth 1 https://github.com/civitai/civitai_comfy_nodes.git \
     custom_nodes/civitai_comfy_nodes
 
-RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git \
+RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git \
     custom_nodes/ComfyUI-Impact-Pack \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Impact-Pack/requirements.txt
 
-RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git \
+RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git \
     custom_nodes/ComfyUI-Impact-Subpack \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Impact-Subpack/requirements.txt || true
 
-RUN git clone https://github.com/WASasquatch/was-node-suite-comfyui.git \
+RUN git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git \
     custom_nodes/was-node-suite-comfyui \
  && pip install --no-cache-dir -r custom_nodes/was-node-suite-comfyui/requirements.txt
 
-RUN git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git \
+RUN git clone --depth 1 https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git \
     custom_nodes/ComfyUI_UltimateSDUpscale
-
-RUN git clone https://github.com/ssitu/ComfyUI-EmptyLatentImage.git \
-    custom_nodes/ComfyUI-EmptyLatentImage || true
 
 
 # ============================================================
 # IMAGE / CONTROL STACK
 # ============================================================
-RUN git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus.git \
+RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git \
     custom_nodes/ComfyUI_IPAdapter_plus
 
 RUN mkdir -p models/ipadapter models/clip_vision
 
-RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git \
+RUN git clone --depth 1 https://github.com/Fannovel16/comfyui_controlnet_aux.git \
     custom_nodes/comfyui_controlnet_aux \
  && pip install --no-cache-dir -r custom_nodes/comfyui_controlnet_aux/requirements.txt
 
-RUN git clone https://github.com/Kosinkadink/ComfyUI-Advanced-ControlNet.git \
+RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-Advanced-ControlNet.git \
     custom_nodes/ComfyUI-Advanced-ControlNet \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Advanced-ControlNet/requirements.txt || true
 
-RUN git clone https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait.git \
+RUN git clone --depth 1 https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait.git \
     custom_nodes/ComfyUI-AdvancedLivePortrait \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-AdvancedLivePortrait/requirements.txt || true
 
@@ -132,53 +141,53 @@ RUN git clone https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait.git 
 # ============================================================
 # LOGIC / PROMPT SYSTEMS
 # ============================================================
-RUN git clone https://github.com/ltdrdata/ComfyUI-Logic.git \
-    custom_nodes/ComfyUI-Logic
+RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Logic.git \
+    custom_nodes/ComfyUI-Logic || true
 
-RUN git clone https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb.git \
+RUN git clone --depth 1 https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb.git \
     custom_nodes/ComfyUI_ADV_CLIP_emb
 
 
 # ============================================================
 # UI / UTILITIES
 # ============================================================
-RUN git clone https://github.com/crystian/ComfyUI-Crystools.git \
+RUN git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git \
     custom_nodes/ComfyUI-Crystools \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Crystools/requirements.txt
 
-RUN git clone https://github.com/city96/ComfyUI-GGUF.git \
+RUN git clone --depth 1 https://github.com/city96/ComfyUI-GGUF.git \
     custom_nodes/ComfyUI-GGUF || true
 
-RUN git clone https://github.com/kijai/ComfyUI-KJNodes.git \
+RUN git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git \
     custom_nodes/ComfyUI-KJNodes \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-KJNodes/requirements.txt
 
-RUN git clone https://github.com/alexopus/ComfyUI-Image-Saver.git \
+RUN git clone --depth 1 https://github.com/alexopus/ComfyUI-Image-Saver.git \
     custom_nodes/ComfyUI-Image-Saver
 
-RUN git clone https://github.com/cubiq/ComfyUI_essentials.git \
+RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git \
     custom_nodes/ComfyUI_essentials \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI_essentials/requirements.txt
 
-RUN git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git \
+RUN git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git \
     custom_nodes/ComfyUI-Custom-Scripts
 
-RUN git clone https://github.com/yolain/ComfyUI-Easy-Use.git \
+RUN git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git \
     custom_nodes/ComfyUI-Easy-Use \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Easy-Use/requirements.txt
 
-RUN git clone https://github.com/stavsap/ComfyUI-Ollama.git \
+RUN git clone --depth 1 https://github.com/stavsap/ComfyUI-Ollama.git \
     custom_nodes/ComfyUI-Ollama \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Ollama/requirements.txt
 
-RUN git clone https://github.com/rgthree/rgthree-comfy.git \
+RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git \
     custom_nodes/rgthree-comfy
 
 
 # ============================================================
 # HF DOWNLOADER
 # ============================================================
-RUN git clone https://github.com/if-ai/ComfyUI-IF_AI_HFDownloaderNode.git \
+RUN git clone --depth 1 https://github.com/if-ai/ComfyUI-IF_AI_HFDownloaderNode.git \
     custom_nodes/ComfyUI-IF_AI_HFDownloaderNode \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-IF_AI_HFDownloaderNode/requirements.txt || true
 
