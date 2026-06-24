@@ -13,9 +13,10 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /workspace
 
 # ============================================================
-# OVH PERFORMANCE LAYER
+# OVH PERFORMANCE LAYER (CACHE + SPEED)
 # ============================================================
 ENV HF_HOME=/workspace/models/hf_cache
+ENV HUGGINGFACE_HUB_CACHE=/workspace/models/hf_cache
 ENV TRANSFORMERS_CACHE=/workspace/models/hf_cache
 ENV TORCH_HOME=/workspace/models/torch_cache
 ENV XDG_CACHE_HOME=/workspace/models/cache
@@ -26,7 +27,7 @@ ENV GIT_TERMINAL_PROMPT=0
 ENV GIT_LFS_SKIP_SMUDGE=1
 
 # ============================================================
-# PYTORCH STABLE STACK
+# PYTORCH
 # ============================================================
 RUN pip install --no-cache-dir --upgrade pip
 
@@ -49,10 +50,11 @@ RUN pip install --no-cache-dir \
     sentencepiece protobuf requests aiohttp psutil \
     opencv-python-headless imageio imageio-ffmpeg av \
     onnxruntime-gpu xformers insightface \
-    diffusers hf_transfer
+    diffusers hf_transfer \
+    gitpython pyyaml scipy scikit-image ffmpeg-python decord mediapipe
 
 # ============================================================
-# COMFYUI MANAGER (ONLY ONCE)
+# COMFYUI MANAGER
 # ============================================================
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git \
     custom_nodes/ComfyUI-Manager \
@@ -88,14 +90,14 @@ RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Logic.git custom_nod
 RUN git clone --depth 1 https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb.git custom_nodes/ComfyUI_ADV_CLIP_emb
 
 # ============================================================
-# UI STACK (A1111-LIKE UX)
+# UI STACK
 # ============================================================
 RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git custom_nodes/ComfyUI_essentials || true
 RUN git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git custom_nodes/ComfyUI-Custom-Scripts || true
 RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git custom_nodes/rgthree-comfy || true
 
 # ============================================================
-# FLUX FOUNDATION (REAL SETUP)
+# FLUX FOUNDATION
 # ============================================================
 RUN pip install --no-cache-dir \
     git+https://github.com/huggingface/diffusers.git
@@ -108,7 +110,18 @@ RUN mkdir -p /workspace/models/flux \
     /workspace/models/embeddings
 
 # ============================================================
-# AUTO MODEL BOOTSTRAP
+# AUTO INSTALL ALL NODE REQUIREMENTS (IMPORTANT FIX)
+# ============================================================
+RUN find custom_nodes -name "requirements.txt" -exec pip install --no-cache-dir -r {} \; || true
+RUN find custom_nodes -name "requirements-no-cupy.txt" -exec pip install --no-cache-dir -r {} \; || true
+
+# ============================================================
+# MODEL STRUCTURE (A1111-LIKE ORGANIZATION)
+# ============================================================
+RUN mkdir -p /workspace/models/{checkpoints,loras,vae,controlnet,embeddings}
+
+# ============================================================
+# STARTUP SCRIPT (WARM CACHE + FAST BOOT)
 # ============================================================
 RUN mkdir -p /workspace/scripts
 
@@ -116,8 +129,12 @@ RUN printf '%s\n' \
 '#!/bin/bash' \
 'set -e' \
 '' \
-'echo "== OVH BOOT ==" ' \
+'echo "== ComfyUI OVH BOOT ==" ' \
 '' \
+'# warm imports for faster startup' \
+'python3 -c "import torch; import comfy; import comfy.model_management" || true' \
+'' \
+'# download SDXL if missing' \
 'if [ ! -f /workspace/models/checkpoints/sdxl.safetensors ]; then' \
 '  echo "Downloading SDXL..."' \
 '  curl -L -o /workspace/models/checkpoints/sdxl.safetensors \' \
@@ -132,9 +149,10 @@ RUN printf '%s\n' \
 RUN chmod +x /workspace/scripts/start.sh
 
 # ============================================================
-# PERMISSIONS
+# PERMISSIONS (IMPORTANT FIX)
 # ============================================================
-RUN chown -R 42420:42420 /workspace
+RUN mkdir -p /workspace/models /workspace/.cache && \
+    chown -R 42420:42420 /workspace
 
 ENV HOME=/workspace
 USER 42420:42420
