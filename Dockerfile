@@ -63,11 +63,11 @@ RUN pip install --no-cache-dir -r custom_nodes/ComfyUI_LayerStyle/requirements.t
 
 # Civitai Integration
 RUN git clone https://github.com/civitai/civitai_comfy_nodes.git custom_nodes/civitai_comfy_nodes
-RUN pip install --no-cache-dir -r custom_nodes/civitai_comfy_nodes/requirements.txt
+RUN pip install --no-cache-dir requests
 
 # Inspire Pack (For LoRA control)
 RUN git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git custom_nodes/ComfyUI-Inspire-Pack
-RUN pip install --no-cache-dir requests
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Inspire-Pack/requirements.txt
 
 # IPAdapter (For image-to-image/style transfer)
 RUN git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus.git \
