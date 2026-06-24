@@ -12,9 +12,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /workspace
 
-
 # ============================================================
-# OVH PERFORMANCE LAYER (CRITICAL)
+# OVH PERFORMANCE LAYER
 # ============================================================
 ENV HF_HOME=/workspace/models/hf_cache
 ENV TRANSFORMERS_CACHE=/workspace/models/hf_cache
@@ -27,7 +26,7 @@ ENV GIT_TERMINAL_PROMPT=0
 ENV GIT_LFS_SKIP_SMUDGE=1
 
 # ============================================================
-# PYTORCH (STABLE MATCHED STACK)
+# PYTORCH STABLE STACK
 # ============================================================
 RUN pip install --no-cache-dir --upgrade pip
 
@@ -35,16 +34,14 @@ RUN pip install --no-cache-dir \
     torch==2.2.2+cu121 torchvision==0.17.2+cu121 torchaudio==2.2.2+cu121 \
     --index-url https://download.pytorch.org/whl/cu121
 
-
 # ============================================================
 # COMFYUI CORE
 # ============================================================
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git .
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 # ============================================================
-# BASE AI STACK (FLUX + SDXL READY)
+# BASE AI STACK
 # ============================================================
 RUN pip install --no-cache-dir \
     numpy einops safetensors tqdm pillow \
@@ -54,14 +51,12 @@ RUN pip install --no-cache-dir \
     onnxruntime-gpu xformers insightface \
     diffusers hf_transfer
 
-
 # ============================================================
-# COMFYUI MANAGER (AUTO FIX + AUTO INSTALL)
+# COMFYUI MANAGER (ONLY ONCE)
 # ============================================================
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git \
     custom_nodes/ComfyUI-Manager \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Manager/requirements.txt || true
-
 
 # ============================================================
 # CORE NODE STACK
@@ -69,7 +64,6 @@ RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git \
 RUN git clone --depth 1 https://github.com/civitai/civitai_comfy_nodes.git custom_nodes/civitai_comfy_nodes || true
 RUN git clone --depth 1 https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git custom_nodes/ComfyUI_UltimateSDUpscale || true
 RUN git clone --depth 1 https://github.com/ssitu/ComfyUI_SDXL_EmptyLatentImage.git custom_nodes/ComfyUI_SDXL_EmptyLatentImage || true
-
 
 # ============================================================
 # VIDEO STACK
@@ -79,13 +73,11 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolv
 RUN git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git custom_nodes/ComfyUI-Frame-Interpolation || true
 RUN pip install --no-cache-dir cupy-cuda12x || true
 
-
 # ============================================================
 # CONTROL STACK
 # ============================================================
 RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git custom_nodes/ComfyUI_IPAdapter_plus
 RUN git clone --depth 1 https://github.com/Fannovel16/comfyui_controlnet_aux.git custom_nodes/comfyui_controlnet_aux
-
 
 # ============================================================
 # CORE PACKS
@@ -95,27 +87,28 @@ RUN git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.gi
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Logic.git custom_nodes/ComfyUI-Logic || true
 RUN git clone --depth 1 https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb.git custom_nodes/ComfyUI_ADV_CLIP_emb
 
-
 # ============================================================
-# UI STACK
+# UI STACK (A1111-LIKE UX)
 # ============================================================
 RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git custom_nodes/ComfyUI_essentials || true
 RUN git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git custom_nodes/ComfyUI-Custom-Scripts || true
-RUN git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git custom_nodes/ComfyUI-Easy-Use || true
 RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git custom_nodes/rgthree-comfy || true
 
+# ============================================================
+# FLUX FOUNDATION (REAL SETUP)
+# ============================================================
+RUN pip install --no-cache-dir \
+    git+https://github.com/huggingface/diffusers.git
+
+RUN mkdir -p /workspace/models/flux \
+    /workspace/models/checkpoints \
+    /workspace/models/loras \
+    /workspace/models/vae \
+    /workspace/models/controlnet \
+    /workspace/models/embeddings
 
 # ============================================================
-# FLUX + SDXL MODEL SYSTEM (REAL ENGINE)
-# ============================================================
-RUN mkdir -p /workspace/models/{checkpoints,loras,controlnet,vae,clip,hf_cache}
-
-# FLUX SUPPORT (diffusers backend already installed)
-RUN pip install --no-cache-dir git+https://github.com/huggingface/diffusers.git
-
-
-# ============================================================
-# MODEL AUTO BOOTSTRAP (SDXL + FLUX CORE MODELS)
+# AUTO MODEL BOOTSTRAP
 # ============================================================
 RUN mkdir -p /workspace/scripts
 
@@ -123,37 +116,28 @@ RUN printf '%s\n' \
 '#!/bin/bash' \
 'set -e' \
 '' \
-'echo "== OVH MODEL BOOT ==" ' \
+'echo "== OVH BOOT ==" ' \
 '' \
-'# SDXL auto download' \
 'if [ ! -f /workspace/models/checkpoints/sdxl.safetensors ]; then' \
 '  echo "Downloading SDXL..."' \
 '  curl -L -o /workspace/models/checkpoints/sdxl.safetensors \' \
 '  https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors' \
 'fi' \
 '' \
-'# FLUX placeholder structure (user loads real weights or HF cache)' \
-'mkdir -p /workspace/models/flux' \
-'' \
-'echo "Boot complete"' \
-'' \
-'# warm import cache (faster startup)' \
-'python3 -c "import torch; import comfy; print(\"warm cache ready\")"' \
+'echo "Startup complete"' \
 '' \
 'exec python3 main.py --listen 0.0.0.0 --port 8188' \
 > /workspace/scripts/start.sh
 
 RUN chmod +x /workspace/scripts/start.sh
 
-
 # ============================================================
-# OVH PERMISSIONS
+# PERMISSIONS
 # ============================================================
 RUN chown -R 42420:42420 /workspace
 
 ENV HOME=/workspace
 USER 42420:42420
-
 
 # ============================================================
 # START
