@@ -1,22 +1,19 @@
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
 # ============================================================
-# System dependencies
+# SYSTEM
 # ============================================================
 RUN apt-get update && apt-get install -y \
     git python3 python3-pip libgl1 libglib2.0-0 \
-    build-essential cmake python3-dev \
+    build-essential cmake python3-dev ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 
-# ============================================================
-# Working directory
-# ============================================================
 WORKDIR /workspace
 
 
 # ============================================================
-# PyTorch (CUDA 12.1)
+# PYTORCH
 # ============================================================
 RUN pip install --no-cache-dir \
     torch torchvision torchaudio \
@@ -24,7 +21,7 @@ RUN pip install --no-cache-dir \
 
 
 # ============================================================
-# Clone ComfyUI
+# COMFYUI CORE
 # ============================================================
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git .
 
@@ -32,35 +29,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # ============================================================
-# ALL PYTHON DEPENDENCIES (CONSOLIDATED)
+# PYTHON BASE (ALL-IN-ONE)
 # ============================================================
 RUN pip install --no-cache-dir \
-    numpy \
-    einops \
-    safetensors \
-    tqdm \
-    pillow \
-    huggingface_hub \
-    hf_transfer \
-    accelerate \
-    transformers \
-    sentencepiece \
-    protobuf \
-    requests \
-    aiohttp \
-    psutil \
-    opencv-python-headless \
-    imageio \
-    imageio-ffmpeg \
-    av \
-    onnxruntime-gpu \
-    xformers \
-    insightface \
-    cupy-cuda12x
+    numpy einops safetensors tqdm pillow \
+    huggingface_hub hf_transfer accelerate transformers \
+    sentencepiece protobuf requests aiohttp psutil \
+    opencv-python-headless imageio imageio-ffmpeg av \
+    onnxruntime-gpu xformers insightface cupy-cuda12x
 
 
 # ============================================================
-# HuggingFace config
+# HF CONFIG
 # ============================================================
 ENV HF_HUB_ENABLE_HF_TRANSFER=1
 ENV HF_HOME=/workspace/.cache/huggingface
@@ -68,7 +48,7 @@ ENV TRANSFORMERS_CACHE=/workspace/.cache/huggingface
 
 
 # ============================================================
-# CORE
+# CORE MANAGER
 # ============================================================
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git \
     custom_nodes/ComfyUI-Manager \
@@ -76,7 +56,7 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git \
 
 
 # ============================================================
-# WAN / VIDEO STACK
+# VIDEO / WAN STACK
 # ============================================================
 RUN git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git \
     custom_nodes/ComfyUI-WanVideoWrapper \
@@ -93,9 +73,15 @@ RUN git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git \
     custom_nodes/ComfyUI-Frame-Interpolation \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements-no-cupy.txt
 
+RUN pip install --no-cache-dir cupy-cuda12x
+
+RUN git clone https://github.com/Kosinkadink/ComfyUI-AnimateDiff-Evolved.git \
+    custom_nodes/ComfyUI-AnimateDiff-Evolved \
+ && pip install --no-cache-dir -r custom_nodes/ComfyUI-AnimateDiff-Evolved/requirements.txt || true
+
 
 # ============================================================
-# MODEL / LOADER TOOLS
+# MODEL / LOADER STACK
 # ============================================================
 RUN git clone https://github.com/willmiao/ComfyUI-Lora-Manager.git \
     custom_nodes/ComfyUI-Lora-Manager \
@@ -108,13 +94,20 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git \
     custom_nodes/ComfyUI-Impact-Pack \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-Impact-Pack/requirements.txt
 
+RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git \
+    custom_nodes/ComfyUI-Impact-Subpack \
+ && pip install --no-cache-dir -r custom_nodes/ComfyUI-Impact-Subpack/requirements.txt || true
+
 RUN git clone https://github.com/WASasquatch/was-node-suite-comfyui.git \
     custom_nodes/was-node-suite-comfyui \
  && pip install --no-cache-dir -r custom_nodes/was-node-suite-comfyui/requirements.txt
 
-RUN git clone https://github.com/chflame163/ComfyUI_LayerStyle.git \
-    custom_nodes/ComfyUI_LayerStyle \
- && pip install --no-cache-dir -r custom_nodes/ComfyUI_LayerStyle/requirements.txt
+RUN git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git \
+    custom_nodes/ComfyUI_UltimateSDUpscale \
+ && pip install --no-cache-dir -r custom_nodes/ComfyUI_UltimateSDUpscale/requirements.txt || true
+
+RUN git clone https://github.com/ssitu/ComfyUI_SDXL_EmptyLatentImage.git \
+    custom_nodes/ComfyUI_SDXL_EmptyLatentImage
 
 
 # ============================================================
@@ -139,7 +132,17 @@ RUN git clone https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait.git 
 
 
 # ============================================================
-# EXTRA NODES
+# LOGIC / PROMPT SYSTEMS
+# ============================================================
+RUN git clone https://github.com/ltdrdata/ComfyUI-Logic.git \
+    custom_nodes/ComfyUI-Logic
+
+RUN git clone https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_emb.git \
+    custom_nodes/ComfyUI_ADV_CLIP_emb
+
+
+# ============================================================
+# UTILITY / UI / EXTRA NODES
 # ============================================================
 RUN git clone https://github.com/crystian/ComfyUI-Crystools.git \
     custom_nodes/ComfyUI-Crystools \
@@ -174,13 +177,17 @@ RUN git clone https://github.com/stavsap/ComfyUI-Ollama.git \
 RUN git clone https://github.com/rgthree/rgthree-comfy.git \
     custom_nodes/rgthree-comfy
 
+
+# ============================================================
+# HF DOWNLOADER
+# ============================================================
 RUN git clone https://github.com/if-ai/ComfyUI-IF_AI_HFDownloaderNode.git \
     custom_nodes/ComfyUI-IF_AI_HFDownloaderNode \
  && pip install --no-cache-dir -r custom_nodes/ComfyUI-IF_AI_HFDownloaderNode/requirements.txt || true
 
 
 # ============================================================
-# Permissions
+# PERMISSIONS
 # ============================================================
 RUN chown -R 42420:42420 /workspace
 
