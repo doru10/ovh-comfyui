@@ -6,9 +6,6 @@ RUN apt-get update && apt-get install -y \
     build-essential cmake python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y \
-    git python3 python3-pip libgl1 libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
 
 # Create working directory
 WORKDIR /workspace
@@ -25,7 +22,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Install nodes
 RUN pip install --no-cache-dir \
-    torchvision \
     numpy \
     einops \
     safetensors \
@@ -45,10 +41,12 @@ RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-VideoHelperSuite/requirem
 RUN git clone https://github.com/naxci1/ComfyUI-FlashVSR_Stable.git custom_nodes/ComfyUI-FlashVSR
 
 RUN git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git custom_nodes/ComfyUI-Frame-Interpolation
-RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements.txt
+RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Frame-Interpolation/requirements-with-cupy.txt
 
-RUN git clone https://github.com/willmiao/ComfyUI-Lora-Manager.git custom_nodes/comfyui-lora-manager
-RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Lora-Manager/requirements.txt
+RUN git clone https://github.com/willmiao/ComfyUI-Lora-Manager.git \
+    custom_nodes/ComfyUI-Lora-Manager
+RUN pip install --no-cache-dir \
+    -r custom_nodes/ComfyUI-Lora-Manager/requirements.txt
 
 # Impact Pack (For Auto-Detailing & Upscaling)
 RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git custom_nodes/ComfyUI-Impact-Pack
@@ -71,8 +69,11 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git custom_nodes/
 RUN pip install --no-cache-dir -r custom_nodes/ComfyUI-Inspire-Pack/requirements.txt
 
 # IPAdapter (For image-to-image/style transfer)
-RUN git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus.git custom_nodes/ComfyUI_IPAdapter_plus
-RUN pip install --no-cache-dir -r custom_nodes/ComfyUI_IPAdapter_plus/requirements.txt
+RUN git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus.git \
+    custom_nodes/ComfyUI_IPAdapter_plus
+RUN mkdir -p models/ipadapter
+RUN mkdir -p models/clip_vision
+RUN pip install --no-cache-dir insightface
 
 # ControlNet Auxiliary Preprocessors
 RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git custom_nodes/comfyui_controlnet_aux
